@@ -1,0 +1,12 @@
+{
+  "name": "invwarehouse",
+  "version": "1.0.0",
+  "description": "warehouse and inventory management system with checking inventory and update and update according to order and in warehouse checking inv and creating po and grn",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
