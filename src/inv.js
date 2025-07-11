@@ -15,7 +15,6 @@ module.exports = async (req, res) => {
     return;
   }
 
-  // Read the incoming JSON body
   let body = '';
   for await (const chunk of req) {
     body += chunk;
@@ -30,7 +29,6 @@ module.exports = async (req, res) => {
     return;
   }
 
-  // Directly create product with data as-is
   try {
     const product = await prisma.product.create({
       data: {
