@@ -13,11 +13,7 @@
       "dest": "/src/inv.js"
     },
     {
-      "src": "/getblob",
-      "methods": ["GET"],
-      "dest": "/src/inv.js"
-    },{
-      "src": "/pushdata",
+      "src": "/postprisma",
       "methods": ["POST"],
       "dest": "/src/inv.js"
     }

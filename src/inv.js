@@ -1,5 +1,86 @@
 "use strict"
-const { put } = require('@vercel/blob');
+const { PrismaClient } = require('@prisma/client');
+
+let prisma;
+if (!global.prisma) {
+  global.prisma = new PrismaClient();
+}
+prisma = global.prisma;
+
+module.exports = async (req, res) => {
+  if (req.method !== 'POST') {
+    res.statusCode = 405;
+    res.setHeader('Allow', 'POST');
+    res.end(JSON.stringify({ error: `Method ${req.method} not allowed` }));
+    return;
+  }
+
+  // Parse incoming request
+  let body = '';
+  for await (const chunk of req) {
+    body += chunk;
+  }
+
+  let data;
+  try {
+    data = JSON.parse(body);
+  } catch (err) {
+    res.statusCode = 400;
+    res.end(JSON.stringify({ error: 'Invalid JSON' }));
+    return;
+  }
+
+  // Validate required fields
+  const requiredFields = [
+    'name', 'sku', 'quantity', 'price', 'tax',
+    'merchant', 'sellerName', 'warehouseName',
+    'warehouseAddr', 'warehouseLat', 'warehouseLng'
+  ];
+
+  const missing = requiredFields.filter(f => data[f] == null);
+  if (missing.length) {
+    res.statusCode = 400;
+    res.end(JSON.stringify({ error: 'Missing fields', missing }));
+    return;
+  }
+
+  // Calculate subTotal and total
+  const subTotal = data.price * data.quantity;
+  const total = subTotal + data.tax;
+
+  try {
+    const product = await prisma.product.create({
+      data: {
+        name: data.name,
+        sku: data.sku,
+        awb: data.awb || null,
+        quantity: data.quantity,
+        price: data.price,
+        tax: data.tax,
+        subTotal: subTotal,
+        total: total,
+        merchant: data.merchant,
+        sellerName: data.sellerName,
+        sellerEmail: data.sellerEmail || null,
+        sellerPhone: data.sellerPhone || null,
+        warehouseName: data.warehouseName,
+        warehouseAddr: data.warehouseAddr,
+        warehouseLat: data.warehouseLat,
+        warehouseLng: data.warehouseLng,
+      }
+    });
+
+    res.statusCode = 201;
+    res.setHeader('Content-Type', 'application/json');
+    res.end(JSON.stringify({ message: 'Product created', product }));
+  } catch (err) {
+    console.error('Error creating product:', err);
+    res.statusCode = 500;
+    res.end(JSON.stringify({ error: 'Failed to create product' }));
+  }
+};
+
+
 
 const createapi = async(req,res)=>{
     const store = []
@@ -20,46 +101,3 @@ const createapi = async(req,res)=>{
 } 
 module.exports = createapi
 
-const getblob = async(req,res)=>{
-    try {
-        const blob = "https://7gjoygkjk57uf9qc.public.blob.vercel-storage.com/pro.json.txt";
-            const request = {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            }
-            const response = await fetch(blob, request);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const data = await response.json();
-            return res.status(200).json({data: data})
-    } catch (error) {
-        console.error("Error fetching blob data:", error);
-        return res.status(500).json({error: "Failed to fetch blob data"});
-    }
-}
-module.exports =  getblob
-
-const pushdata = async(req,res)=>{
-    const data = req.body;
-    if (!data || !Array.isArray(data)) {
-        return res.status(400).json({error: "Invalid data format"});
-    }
-    console.log(data)
-     const jsonString = JSON.stringify(data, null, 2);
-     try {
-        const blob = "pro.json.txt"
-        const {url} = await put(blob, jsonString, {
-            access: 'public',
-            allowOverwrite: true,
-        })
-    console.log("Data pushed to blob successfully!");
-    console.log("Blob URL:", url);
-     } catch (error) {
-        console.error("Error pushing data to blob:", error);
-        return res.status(500).json({error: "Failed to push data to blob"});
-     }
-}
-module.exports = pushdata;
