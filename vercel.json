@@ -9,7 +9,7 @@
   "routes": [
     {
       "src": "/inventory",
-      "methods": ["POST"],
+      "methods": ["GET"],
       "dest": "/src/inv.js"
     },
     {

@@ -62,29 +62,23 @@ module.exports = async (req, res) => {
 };
 
 
-// const createapi = async (req, res) => {
-//   const store = [];
-//   const body = req.body;
-//   console.log(body);
-//   if (
-//     !body.id ||
-//     !body.sku ||
-//     !body.units ||
-//     !body.cost ||
-//     !body.supplier ||
-//     !body.lat ||
-//     !body.lng
-//   ) {
-//     console.warn("please fill all the feilds");
-//     return {
-//       res: res.status(400).json({ error: "Please fill all the fields" }),
-//     };
-//   }
-//   store.push(body);
-//   console.log(store);
-//   return res.status(200).json({
-//     message: "Data received successfully",
-//     data: store,
-//   });
-// };
-// module.exports = createapi;
+module.exports = async (req, res) => {
+  if (req.method !== 'GET') {
+    res.statusCode = 405;
+    res.setHeader('Allow', 'GET');
+    return res.end(JSON.stringify({ error: `Method ${req.method} not allowed` }));
+  }
+
+  try {
+    const products = await prisma.product.findMany({
+      orderBy: { createdAt: 'desc' }
+    });
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'application/json');
+    return res.end(JSON.stringify(products));
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    res.statusCode = 500;
+    return res.end(JSON.stringify({ error: 'Failed to fetch products' }));
+  }
+};
