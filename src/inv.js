@@ -15,7 +15,7 @@ module.exports = async (req, res) => {
     return;
   }
 
-  // Read raw body
+  // Read and parse JSON body
   let body = "";
   for await (const chunk of req) {
     body += chunk;
@@ -30,9 +30,7 @@ module.exports = async (req, res) => {
     return;
   }
 
-  console.log("Received data:", data);
-
-  // Required fields
+  // Define required fields exactly as in your schema (excluding optional ones)
   const requiredFields = [
     "name",
     "sku",
@@ -47,24 +45,24 @@ module.exports = async (req, res) => {
     "warehouseLng",
   ];
 
-  // Check missing fields (null or undefined)
+  // Check for missing fields (only undefined or null counts)
   const missing = requiredFields.filter(
-    (f) => data[f] === undefined || data[f] === null
+    (field) => data[field] === undefined || data[field] === null
   );
 
-  console.log("Missing fields:", missing);
-
-  if (missing.length) {
+  if (missing.length > 0) {
+    console.warn("please fill all the fields", missing);
     res.statusCode = 400;
     res.end(JSON.stringify({ error: "Missing fields", missing }));
     return;
   }
 
-  // Calculate totals server-side
+  // Calculate subTotal and total
   const subTotal = data.price * data.quantity;
   const total = subTotal + data.tax;
 
   try {
+    // Create product record in database
     const product = await prisma.product.create({
       data: {
         name: data.name,
@@ -73,8 +71,8 @@ module.exports = async (req, res) => {
         quantity: data.quantity,
         price: data.price,
         tax: data.tax,
-        subTotal,
-        total,
+        subTotal: subTotal,
+        total: total,
         merchant: data.merchant,
         sellerName: data.sellerName,
         sellerEmail: data.sellerEmail || null,
