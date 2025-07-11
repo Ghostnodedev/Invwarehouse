@@ -34,13 +34,23 @@ module.exports = async (req, res) => {
 
   // Required fields
   const requiredFields = [
-    "name", "sku", "quantity", "price", "tax",
-    "merchant", "sellerName",
-    "warehouseName", "warehouseAddr", "warehouseLat", "warehouseLng"
+    "name",
+    "sku",
+    "quantity",
+    "price",
+    "tax",
+    "merchant",
+    "sellerName",
+    "warehouseName",
+    "warehouseAddr",
+    "warehouseLat",
+    "warehouseLng",
   ];
 
   // Check missing fields (null or undefined)
-  const missing = requiredFields.filter(f => data[f] === undefined || data[f] === null);
+  const missing = requiredFields.filter(
+    (f) => data[f] === undefined || data[f] === null
+  );
 
   console.log("Missing fields:", missing);
 
@@ -73,7 +83,7 @@ module.exports = async (req, res) => {
         warehouseAddr: data.warehouseAddr,
         warehouseLat: data.warehouseLat,
         warehouseLng: data.warehouseLng,
-      }
+      },
     });
 
     res.statusCode = 201;
@@ -86,23 +96,29 @@ module.exports = async (req, res) => {
   }
 };
 
-
-const createapi = async(req,res)=>{
-    const store = []
-    const body = req.body
-    console.log(body)
-    if (!body.id || !body.sku || !body.units || !body.cost || !body.supplier || !body.lat || !body.lng){
-        console.warn("please fill all the feilds")
-        return{
-            res: res.status(400).json({error: "Please fill all the fields"}),
-        }
-    }
-    store.push(body)
-    console.log(store)
-    return res.status(200).json({
-        message: "Data received successfully",
-        data: store
-    })
-} 
-module.exports = createapi
-
+const createapi = async (req, res) => {
+  const store = [];
+  const body = req.body;
+  console.log(body);
+  if (
+    !body.id ||
+    !body.sku ||
+    !body.units ||
+    !body.cost ||
+    !body.supplier ||
+    !body.lat ||
+    !body.lng
+  ) {
+    console.warn("please fill all the feilds");
+    return {
+      res: res.status(400).json({ error: "Please fill all the fields" }),
+    };
+  }
+  store.push(body);
+  console.log(store);
+  return res.status(200).json({
+    message: "Data received successfully",
+    data: store,
+  });
+};
+module.exports = createapi;
