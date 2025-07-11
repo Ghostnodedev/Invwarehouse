@@ -15,6 +15,7 @@ module.exports = async (req, res) => {
     return;
   }
 
+  // Read raw body
   let body = "";
   for await (const chunk of req) {
     body += chunk;
@@ -29,48 +30,27 @@ module.exports = async (req, res) => {
     return;
   }
 
-const requiredFields = [
-  "name", "sku", "quantity", "price", "tax",
-  "merchant", "sellerName",
-  "warehouseName", "warehouseAddr", "warehouseLat", "warehouseLng"
-];
+  console.log("Received data:", data);
 
+  // Required fields
+  const requiredFields = [
+    "name", "sku", "quantity", "price", "tax",
+    "merchant", "sellerName",
+    "warehouseName", "warehouseAddr", "warehouseLat", "warehouseLng"
+  ];
 
-  // Check missing or null/undefined
-  const missing = requiredFields.filter(
-    (f) => data[f] === undefined || data[f] === null
-  );
+  // Check missing fields (null or undefined)
+  const missing = requiredFields.filter(f => data[f] === undefined || data[f] === null);
+
+  console.log("Missing fields:", missing);
+
   if (missing.length) {
     res.statusCode = 400;
     res.end(JSON.stringify({ error: "Missing fields", missing }));
     return;
   }
 
-  // Validate types
-  if (
-    typeof data.name !== "string" ||
-    typeof data.sku !== "string" ||
-    typeof data.price !== "number" ||
-    typeof data.tax !== "number" ||
-    typeof data.quantity !== "number" ||
-    typeof data.merchant !== "string" ||
-    typeof data.sellerName !== "string" ||
-    typeof data.warehouseName !== "string" ||
-    typeof data.warehouseAddr !== "string" ||
-    typeof data.warehouseLat !== "number" ||
-    typeof data.warehouseLng !== "number"
-  ) {
-    res.statusCode = 400;
-    res.end(
-      JSON.stringify({
-        error:
-          "Invalid field types. Check that quantity, price, tax, lat, lng are numbers and others are strings.",
-      })
-    );
-    return;
-  }
-
-  // Calculate subtotal and total
+  // Calculate totals server-side
   const subTotal = data.price * data.quantity;
   const total = subTotal + data.tax;
 
@@ -93,7 +73,7 @@ const requiredFields = [
         warehouseAddr: data.warehouseAddr,
         warehouseLat: data.warehouseLat,
         warehouseLng: data.warehouseLng,
-      },
+      }
     });
 
     res.statusCode = 201;
