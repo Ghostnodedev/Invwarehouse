@@ -53,6 +53,7 @@ const pushdata = async(req,res)=>{
         const blob = "pro.json.txt"
         const {url} = await put(blob, jsonString, {
             access: 'public',
+            allowOverwrite: true,
         })
     console.log("Data pushed to blob successfully!");
     console.log("Blob URL:", url);
