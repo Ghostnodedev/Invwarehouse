@@ -41,3 +41,24 @@ const getblob = async(req,res)=>{
     }
 }
 module.exports =  getblob
+
+const pushdata = async(req,res)=>{
+    const data = req.body;
+    if (!data || !Array.isArray(data)) {
+        return res.status(400).json({error: "Invalid data format"});
+    }
+    console.log(data)
+     const jsonString = JSON.stringify(data, null, 2);
+     try {
+        const blob = "pro.json.txt"
+        const {url} = await put(blob, jsonString, {
+            access: 'public',
+        })
+    console.log("Data pushed to blob successfully!");
+    console.log("Blob URL:", url);
+     } catch (error) {
+        console.error("Error pushing data to blob:", error);
+        return res.status(500).json({error: "Failed to push data to blob"});
+     }
+}
+module.exports = pushdata;

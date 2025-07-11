@@ -16,6 +16,10 @@
       "src": "/getblob",
       "methods": ["GET"],
       "dest": "/src/inv.js"
+    },{
+      "src": "/pushdata",
+      "methods": ["POST"],
+      "dest": "/src/inv.js"
     }
   ]
 }
