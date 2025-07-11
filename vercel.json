@@ -11,6 +11,11 @@
       "src": "/inventory",
       "methods": ["POST"],
       "dest": "/src/inv.js"
+    },
+    {
+      "src": "/getblob",
+      "methods": ["GET"],
+      "dest": "/src/inv.js"
     }
   ]
 }
