@@ -23,7 +23,7 @@ module.exports = createapi
 
 const getblob = async(req,res)=>{
     try {
-        if(method === 'get'){
+
             const request = {
                 method: 'GET',
                 headers: {
@@ -36,7 +36,6 @@ const getblob = async(req,res)=>{
             }
             const data = await response.json();
             return res.status(200).json({data: data})
-        }
     } catch (error) {
         console.error("Error fetching blob data:", error);
         return res.status(500).json({error: "Failed to fetch blob data"});
