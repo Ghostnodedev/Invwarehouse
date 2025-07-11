@@ -15,6 +15,7 @@ module.exports = async (req, res) => {
     return;
   }
 
+  // Read the incoming JSON body
   let body = '';
   for await (const chunk of req) {
     body += chunk;
@@ -29,26 +30,7 @@ module.exports = async (req, res) => {
     return;
   }
 
-  console.info('Received data:', data);
-
-  const requiredFields = [
-    'name', 'sku', 'quantity', 'price', 'tax',
-    'merchant', 'sellerName',
-    'warehouseName', 'warehouseAddr', 'warehouseLat', 'warehouseLng'
-  ];
-
-  const missing = requiredFields.filter(field => data[field] === undefined || data[field] === null);
-
-  if (missing.length > 0) {
-    console.warn('please fill all the fields', missing);
-    res.statusCode = 400;
-    res.end(JSON.stringify({ error: 'Missing fields', missing }));
-    return;
-  }
-
-  const subTotal = data.price * data.quantity;
-  const total = subTotal + data.tax;
-
+  // Directly create product with data as-is
   try {
     const product = await prisma.product.create({
       data: {
@@ -58,8 +40,8 @@ module.exports = async (req, res) => {
         quantity: data.quantity,
         price: data.price,
         tax: data.tax,
-        subTotal: subTotal,
-        total: total,
+        subTotal: data.subTotal !== undefined ? data.subTotal : data.price * data.quantity,
+        total: data.total !== undefined ? data.total : (data.price * data.quantity) + data.tax,
         merchant: data.merchant,
         sellerName: data.sellerName,
         sellerEmail: data.sellerEmail || null,
