@@ -22,7 +22,7 @@ module.exports = createapi
 
 const getblob = async(req,res)=>{
     try {
-        const blob = process.env.BLOB;
+        const blob = "https://7gjoygkjk57uf9qc.public.blob.vercel-storage.com/pro.json.txt";
             const request = {
                 method: 'GET',
                 headers: {
