@@ -29,20 +29,12 @@ module.exports = async (req, res) => {
     return;
   }
 
-  // Required fields
-  const requiredFields = [
-    "name",
-    "sku",
-    "quantity",
-    "price",
-    "tax",
-    "merchant",
-    "sellerName",
-    "warehouseName",
-    "warehouseAddr",
-    "warehouseLat",
-    "warehouseLng",
-  ];
+const requiredFields = [
+  "name", "sku", "quantity", "price", "tax",
+  "merchant", "sellerName",
+  "warehouseName", "warehouseAddr", "warehouseLat", "warehouseLng"
+];
+
 
   // Check missing or null/undefined
   const missing = requiredFields.filter(
