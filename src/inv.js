@@ -1,7 +1,6 @@
 "use strict"
 const { put } = require('@vercel/blob');
 
-const blob = process.env.BLOB
 const createapi = async(req,res)=>{
     const store = []
     const body = req.body
@@ -23,7 +22,7 @@ module.exports = createapi
 
 const getblob = async(req,res)=>{
     try {
-
+        const blob = process.env.BLOB;
             const request = {
                 method: 'GET',
                 headers: {
