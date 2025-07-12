@@ -70,30 +70,26 @@ module.exports = async (req, res) => {
     }
 
   } else if (req.method === 'DELETE') {
-    const { sku } = req.query;
-    const skuInt = parseInt(sku);
-    if (isNaN(skuInt)) {
-      res.statusCode = 400;
-      res.end(JSON.stringify({ error: 'Invalid SKU' }));
-      return;
-    }
+  const { sku } = req.query;
 
-    try {
-      await prisma.product.delete({
-        where: { sku: skuInt }
-      });
-      res.statusCode = 200;
-      res.setHeader('Content-Type', 'application/json');
-      res.end(JSON.stringify({ message: 'Product deleted successfully' }));
-    } catch (error) {
-      console.error('Error deleting product:', error);
-      res.statusCode = 500;
-      res.end(JSON.stringify({ error: 'Failed to delete product' }));
-    }
-
-  } else {
-    res.statusCode = 405;
-    res.setHeader('Allow', 'GET, POST, DELETE');
-    res.end(JSON.stringify({ error: `Method ${req.method} not allowed` }));
+  if (!sku) {
+    res.statusCode = 400;
+    res.end(JSON.stringify({ error: 'SKU is required' }));
+    return;
   }
-};
+
+  try {
+    const deleted = await prisma.product.delete({
+      where: { sku } // no parseInt – treat it as string
+    });
+
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'application/json');
+    res.end(JSON.stringify({ message: 'Product deleted successfully', deleted }));
+  } catch (error) {
+    console.error('Error deleting product:', error);
+    res.statusCode = 500;
+    res.end(JSON.stringify({ error: 'Failed to delete product' }));
+  }
+  }
+}
