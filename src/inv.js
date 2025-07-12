@@ -80,7 +80,7 @@ module.exports = async (req, res) => {
 
   try {
     const deleted = await prisma.product.delete({
-      where: { sku } // no parseInt – treat it as string
+      where: { sku }  // now valid, because sku is @unique
     });
 
     res.statusCode = 200;
@@ -91,5 +91,5 @@ module.exports = async (req, res) => {
     res.statusCode = 500;
     res.end(JSON.stringify({ error: 'Failed to delete product' }));
   }
-  }
+}
 }

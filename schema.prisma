@@ -12,7 +12,7 @@ datasource db {
 model Product {
   id             Int      @id @default(autoincrement())
   name           String
-  sku            String
+  sku            String   @unique
   awb            String?   // airway bill (optional)
   quantity       Int
   price          Float     // unit price
