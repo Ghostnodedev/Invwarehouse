@@ -9,17 +9,7 @@
   "routes": [
     {
       "src": "/inventory",
-      "methods": ["GET"],
-      "dest": "/src/inv.js"
-    },
-    {
-      "src": "/postprisma",
-      "methods": ["POST"],
-      "dest": "/src/inv.js"
-    },
-    {
-      "src": "/deletefromdb",
-      "methods": ["DELETE"],
+      "methods": ["GET", "POST", "DELETE"],
       "dest": "/src/inv.js"
     }
   ]

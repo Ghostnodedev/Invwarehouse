@@ -1,11 +1,6 @@
 "use strict";
 const { PrismaClient } = require('@prisma/client');
-
-let prisma;
-if (!global.prisma) {
-  global.prisma = new PrismaClient();
-}
-prisma = global.prisma;
+const prisma = new PrismaClient();
 
 module.exports = async (req, res) => {
   if (req.method === 'POST') {
@@ -32,8 +27,14 @@ module.exports = async (req, res) => {
           quantity: data.quantity,
           price: data.price,
           tax: data.tax,
-          subTotal: data.subTotal !== undefined ? data.subTotal : data.price * data.quantity,
-          total: data.total !== undefined ? data.total : (data.price * data.quantity) + data.tax,
+          subTotal:
+            data.subTotal !== undefined
+              ? data.subTotal
+              : data.price * data.quantity,
+          total:
+            data.total !== undefined
+              ? data.total
+              : data.price * data.quantity + data.tax,
           merchant: data.merchant,
           sellerName: data.sellerName,
           sellerEmail: data.sellerEmail || null,
@@ -42,7 +43,7 @@ module.exports = async (req, res) => {
           warehouseAddr: data.warehouseAddr,
           warehouseLat: data.warehouseLat,
           warehouseLng: data.warehouseLng,
-        }
+        },
       });
 
       res.statusCode = 201;
@@ -67,19 +68,20 @@ module.exports = async (req, res) => {
       res.statusCode = 500;
       res.end(JSON.stringify({ error: 'Failed to fetch products' }));
     }
-  } else {
-    res.statusCode = 405;
-    res.setHeader('Allow', 'GET, POST');
-    res.end(JSON.stringify({ error: `Method ${req.method} not allowed` }));
-  }
-};
 
-const deletefromdb = async(req,res)=>{
-    const {sku} = req.query
+  } else if (req.method === 'DELETE') {
+    const { sku } = req.query;
+    const skuInt = parseInt(sku);
+    if (isNaN(skuInt)) {
+      res.statusCode = 400;
+      res.end(JSON.stringify({ error: 'Invalid SKU' }));
+      return;
+    }
+
     try {
       await prisma.product.delete({
-        where:{sku: parseInt(sku)}
-      })
+        where: { sku: skuInt }
+      });
       res.statusCode = 200;
       res.setHeader('Content-Type', 'application/json');
       res.end(JSON.stringify({ message: 'Product deleted successfully' }));
@@ -88,6 +90,10 @@ const deletefromdb = async(req,res)=>{
       res.statusCode = 500;
       res.end(JSON.stringify({ error: 'Failed to delete product' }));
     }
-}
 
-module.exports.deletefromdb = deletefromdb;
+  } else {
+    res.statusCode = 405;
+    res.setHeader('Allow', 'GET, POST, DELETE');
+    res.end(JSON.stringify({ error: `Method ${req.method} not allowed` }));
+  }
+};
