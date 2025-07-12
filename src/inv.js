@@ -75,10 +75,10 @@ module.exports = async (req, res) => {
 };
 
 const deletefromdb = async(req,res)=>{
-    const {id} = req.query
+    const {sku} = req.query
     try {
       await prisma.product.delete({
-        where:{id: parseInt(id)}
+        where:{sku: parseInt(sku)}
       })
       res.statusCode = 200;
       res.setHeader('Content-Type', 'application/json');
