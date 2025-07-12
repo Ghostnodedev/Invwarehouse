@@ -73,3 +73,21 @@ module.exports = async (req, res) => {
     res.end(JSON.stringify({ error: `Method ${req.method} not allowed` }));
   }
 };
+
+const deletefromdb = async(req,res)=>{
+    const {id} = req.query
+    try {
+      await prisma.product.delete({
+        where:{id: parseInt(id)}
+      })
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify({ message: 'Product deleted successfully' }));
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: 'Failed to delete product' }));
+    }
+}
+
+module.exports.deletefromdb = deletefromdb;
